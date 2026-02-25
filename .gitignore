@@ -1,0 +1,76 @@
+node_modules/
+dist/
+# Environment files - comprehensive pattern
+.env*
+!.env.example
+*.log
+.DS_Store
+.ai-review/
+*.tgz
+coverage/
+.vscode/
+.idea/
+
+# Backend configuration with sensitive IDs
+backend/wrangler.toml
+
+# Development/Internal Documentation (not for public)
+COMPREHENSIVE_FEATURE_PLAN.md
+DEVELOPMENT_STATUS.md
+IMPLEMENTATION_PLAN.md
+PHASE1_PROGRESS.md
+PROJECT_SUMMARY.md
+PR_DESCRIPTION.md
+PR_CLOAKSCAN_REBRAND.md
+FINAL_PR_DESCRIPTION.md
+SECURITY_TESTING_ANALYSIS.md
+SHIPPING_CHECKLIST.md
+WARP.md
+
+# ============================================
+# Internal/Development Documentation
+# (Kept locally, not for public repository)
+# ============================================
+
+# Root level internal docs
+ARCHITECTURE.md
+BUILD_STATUS.md
+CLAUDE.md
+COMPLETION_REPORT.md
+DEPLOYMENT.md
+EDGE_CASES.md
+PRD.md
+
+# Backend internal docs
+backend/DATABASE_SCHEMA.md
+backend/DEPLOYMENT_CHECKLIST.md
+backend/README.md
+backend/SETUP_SUMMARY.md
+backend/SUPABASE_SETUP.md
+
+# Docs folder internal planning
+docs/AI_ARCHITECTURE.md
+docs/AI_FEATURES_MASTER_PLAN.md
+docs/AI_IMPLEMENTATION_DECISIONS.md
+docs/PHASE_4_5_IMPLEMENTATION_PLAN.md
+docs/CLOUDFLARE_DOMAIN_SETUP.md
+docs/database-schema.md
+docs/deployment.md
+docs/API.md
+docs/RATE_LIMITING.md
+
+# CLI test artifacts
+cli/code-review-*.md
+
+# Add to .gitignore (root level or cli/.gitignore if it exists)
+cli/__tests__/**/*.js
+cli/__tests__/**/*.d.ts
+cli/__tests__/**/*.js.map
+cli/__tests__/**/*.d.ts.map
+
+act.env
+ci-gitconfig
+ci-netrc
+cli/scripts/*
+cli/scripts/update-act-cache.sh
+cli/scripts/ACT_USAGE.md

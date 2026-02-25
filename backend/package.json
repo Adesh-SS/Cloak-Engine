@@ -1,0 +1,22 @@
+{
+  "name": "cloakscan-backend",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers backend for CloakScan",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "setup-secrets": "./scripts/setup-secrets.sh",
+    "verify": "./scripts/verify-setup.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^4.47.0"
+  }
+}

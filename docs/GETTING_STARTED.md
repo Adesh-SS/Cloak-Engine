@@ -1,0 +1,402 @@
+# Getting Started with CloakScan
+
+## What is CloakScan?
+
+CloakScan is a privacy-first CLI tool that uses AI to automatically review your code for:
+
+- Code quality issues
+- Potential bugs
+- Security vulnerabilities
+- Performance problems
+- Best practice violations
+
+## Key Features
+
+- **Privacy-First**: Never uploads source code, only anonymized metadata
+- **Multi-Provider**: Supports OpenAI, Claude, Gemini, Ollama, and more
+- **Offline-Capable**: Works without internet using local AI models
+- **Universal**: Works with any git-based repository
+- **Free Security Scans**: Built-in SAST-like security scanning
+
+## Installation
+
+### Via NPM (Recommended)
+
+```bash
+npm install -g cloakscan
+```
+
+### From Source
+
+```bash
+git clone https://github.com/ntanwir10/CloakScan.git
+cd CloakScan/cli
+npm install
+npm run build
+npm link
+```
+
+## Quick Start
+
+### 1. Initialize
+
+```bash
+cd your-project
+cloakscan init
+```
+
+This generates a unique `client_id` stored locally in `~/.cloakscan/config.yml`.
+
+### 2. Configure AI Provider
+
+```bash
+cloakscan config
+```
+
+Choose your AI provider and enter API key:
+
+- **OpenAI** (GPT-4): Get key from [platform.openai.com](https://platform.openai.com)
+- **Claude**: Get key from [console.anthropic.com](https://console.anthropic.com)
+- **Gemini**: Get key from [makersuite.google.com](https://makersuite.google.com)
+- **Ollama** (Local): Install from [ollama.ai](https://ollama.ai)
+
+### 3. Run Your First Review
+
+```bash
+cloakscan run
+```
+
+This will:
+
+1. Count lines of code
+2. Validate credits (if online)
+3. Analyze your codebase with AI
+4. Generate a detailed report
+
+### 4. Check Your Status
+
+```bash
+cloakscan status
+```
+
+View your configuration, repository info, and remaining credits.
+
+## Using Local AI (Offline)
+
+### With Ollama
+
+1. Install Ollama: <https://ollama.ai>
+2. Pull a model:
+
+```bash
+ollama pull codellama
+```
+
+3. Configure CloakScan:
+
+```bash
+cloakscan config
+# Select "ollama" as provider
+# Default endpoint: http://localhost:11434
+```
+
+4. Run offline:
+
+```bash
+cloakscan run --no-cloud
+```
+
+### With LM Studio
+
+1. Install LM Studio: <https://lmstudio.ai>
+2. Start server (default port 1234)
+3. Configure:
+
+```bash
+cloakscan config
+# Select "lmstudio" as provider
+# Default endpoint: http://localhost:1234
+```
+
+## Security Scanning
+
+Run a free security scan:
+
+```bash
+cloakscan security
+```
+
+For verbose debug output, use the `--debug` flag:
+
+```bash
+cloakscan security --debug
+```
+
+This performs SAST-like scanning for:
+
+- Hardcoded secrets
+- SQL injection vulnerabilities
+- XSS vulnerabilities
+- Insecure cryptography
+- Code injection risks
+- And more...
+
+## Review Specific Files
+
+Target specific files or patterns:
+
+```bash
+# Review specific files
+cloakscan run -f src/main.ts src/utils/*.ts
+
+# Security scan on specific directory
+cloakscan security -f src/auth/**/*.js
+```
+
+## Understanding Reports
+
+Reports are saved as Markdown files with:
+
+### 1. Overview
+
+- Repository information
+- Branch name
+- AI provider used
+- Processing time
+
+### 2. Code Statistics
+
+- Total lines analyzed
+- Code vs. comment vs. blank lines
+- File count
+
+### 3. Findings
+
+Categorized by severity:
+
+- 🔴 **Critical**: Urgent security or functional issues
+- 🟠 **High**: Important issues affecting security or reliability
+- 🟡 **Medium**: Quality or maintainability concerns
+- 🔵 **Low**: Minor improvements or style issues
+
+### 4. Recommendations
+
+Actionable suggestions for improving your codebase.
+
+## Common Workflows
+
+### Daily Code Review
+
+```bash
+# Review changes in current branch
+git checkout feature/my-feature
+cloakscan run
+
+# Review and generate HTML report
+cloakscan run > review.md
+# Open review.md in browser
+```
+
+### Pre-Commit Security Check
+
+```bash
+# Add to .git/hooks/pre-commit
+#!/bin/bash
+cloakscan security --no-cloud
+if [ $? -ne 0 ]; then
+  echo "Security issues found! Review before committing."
+  exit 1
+fi
+```
+
+### CI/CD Integration
+
+```yaml
+# GitHub Actions example
+- name: Run CloakScan
+  run: |
+    npm install -g cloakscan
+    cloakscan init
+    cloakscan config --provider openai --key ${{ secrets.OPENAI_API_KEY }}
+    cloakscan run --no-cloud
+```
+
+## Command Flags and Options
+
+CloakScan commands support various flags to customize behavior. Flags use kebab-case in the CLI (e.g., `--with-ai`, `--no-body`) and are automatically converted to camelCase in the code.
+
+### Common Flags
+
+- **File Selection**: `-f, --files <patterns...>` - Specify files or patterns to analyze
+- **Debug Mode**: `--debug` - Enable verbose debug logging (available for `security` command)
+- **Output**: `-o, --output <path>` - Specify output file path
+- **Negated Flags**: Flags like `--no-body` or `--no-cloud` disable features
+
+### Examples
+
+```bash
+# Security scan with debug output
+cloakscan security --debug
+
+# Scan specific files
+cloakscan security -f src/**/*.ts
+
+# Generate commit message without body
+cloakscan commit --no-body
+
+# Run with AI enhancement disabled
+cloakscan run --no-with-ai
+```
+
+### Flag Naming Convention
+
+- CLI flags use **kebab-case**: `--with-ai`, `--test-command`, `--embedding-provider`
+- Code properties use **camelCase**: `withAi`, `testCommand`, `embeddingProvider`
+- Negated flags (`--no-*`) are converted to boolean properties: `--no-body` → `body: false`
+
+## Troubleshooting
+
+### Missing Dependencies
+
+If you encounter errors like "Cannot find module 'typescript'", this means a required runtime dependency is missing.
+
+**Solution:**
+
+```bash
+# Install missing dependency
+npm install typescript
+
+# Or reinstall CloakScan globally
+npm install -g cloakscan
+```
+
+**Common Issues:**
+
+- **"TypeScript is required but not installed"**: Run `npm install typescript` or reinstall CloakScan
+- **"Cannot find module 'typescript'"**: Ensure TypeScript is in your `package.json` dependencies
+- **Docker/Alpine errors**: See [Docker Guide](DOCKER_GUIDE.md) for Alpine-specific setup
+
+### Debug Mode
+
+Enable verbose logging to troubleshoot issues:
+
+```bash
+# Using environment variable
+CLOAKSCAN_DEBUG=true cloakscan <command>
+
+# Or using --debug flag (for security command)
+cloakscan security --debug
+```
+
+## Configuration Options
+
+Edit `~/.cloakscan/config.yml`:
+
+```yaml
+clientId: your-uuid
+provider: openai
+apiKey: sk-...
+telemetryEnabled: true
+offlineMode: false
+createdAt: '2024-01-15T10:00:00Z'
+lastUsed: '2024-01-15T15:30:00Z'
+```
+
+## Privacy & Telemetry
+
+### What is Collected?
+
+Only anonymized metadata:
+
+- Hashed repository ID
+- Lines of code count
+- AI provider used
+- Processing duration
+- Action type (review/security)
+
+### What is NOT Collected?
+
+- Source code
+- File names
+- Variable names
+- Comments
+- Any PII
+
+### Disabling Telemetry
+
+```bash
+cloakscan config
+# Select "No" for telemetry
+```
+
+Or edit config:
+
+```yaml
+telemetryEnabled: false
+```
+
+## Troubleshooting
+
+### "Configuration not found"
+
+Run `cloakscan init` first.
+
+### "AI provider not configured"
+
+Run `cloakscan config` and set up your provider.
+
+### "Insufficient credits"
+
+Either:
+
+- Purchase more credits online
+- Use `--no-cloud` flag
+- Switch to local AI provider (Ollama)
+
+### "Could not connect to provider"
+
+- Check your API key
+- Verify internet connection
+- Test provider endpoint
+
+### Rate Limited by AI Provider
+
+Most providers have rate limits. Wait a minute and try again, or upgrade your provider account.
+
+## Advanced Usage
+
+### Custom API Endpoints
+
+```bash
+export API_BASE_URL=https://your-custom-api.com
+cloakscan run
+```
+
+### Multiple Profiles
+
+You can maintain different configs by using environment variables:
+
+```bash
+export AI_REVIEW_CONFIG_DIR=~/.cloakscan-work
+cloakscan init
+```
+
+### Batch Processing
+
+```bash
+#!/bin/bash
+for repo in ~/projects/*; do
+  cd $repo
+  cloakscan run -f "src/**/*.ts"
+done
+```
+
+## Getting Help
+
+- Documentation: <https://cloakscancli.com/docs>
+- Issues: <https://github.com/ntanwir10/CloakScan/issues>
+
+## Next Steps
+
+- Read the [API Documentation](./API.md)
+- Check [Contributing Guide](./CONTRIBUTING.md)
