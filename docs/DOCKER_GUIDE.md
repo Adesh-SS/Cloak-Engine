@@ -2184,7 +2184,7 @@ spec:
 - [Main README](../README.md)
 - [Getting Started Guide](GETTING_STARTED.md)
 - [Alpine Linux Quick Reference](../DOCKER_ALPINE_GUIDE.md)
-- [Issue #25 - Alpine Linux Fix](https://github.com/ntanwir10/CloakScan/issues/25)
+- [Issue #25 - Alpine Linux Fix](https://github.com/SDhinakar/Cloak-Engine/issues/25)
 - [Docker Documentation](https://docs.docker.com/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 
@@ -2216,7 +2216,7 @@ If you're still experiencing issues:
    mkdir -p ~/.cloakscan && echo "test" > ~/.cloakscan/test.txt
    ```
 
-4. **Open an issue:** [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
+4. **Open an issue:** [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
    - Include the debug log
    - Mention your OS and Docker version
    - Include your Dockerfile or docker-compose.yml if relevant

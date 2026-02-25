@@ -385,4 +385,4 @@ CloakScan - 100% Free & Open Source Privacy-First Security Scanning and AI Code 
 
 ## Future Releases
 
-See [GitHub Releases](https://github.com/ntanwir10/CloakScan/releases) for upcoming versions.
+See [GitHub Releases](https://github.com/SDhinakar/Cloak-Engine/releases) for upcoming versions.

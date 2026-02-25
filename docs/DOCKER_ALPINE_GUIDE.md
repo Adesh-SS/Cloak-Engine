@@ -254,7 +254,7 @@ If you're still experiencing issues:
    mkdir -p ~/.cloakscan && echo "test" > ~/.cloakscan/test.txt
    ```
 
-4. **Open an issue:** [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
+4. **Open an issue:** [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
    - Include the debug log
    - Mention your Docker image
    - Include your Dockerfile if relevant
@@ -263,4 +263,4 @@ If you're still experiencing issues:
 
 - [Main README](../README.md)
 - [Getting Started Guide](../docs/GETTING_STARTED.md)
-- [Issue #25 - Alpine Linux Fix](https://github.com/ntanwir10/CloakScan/issues/25)
+- [Issue #25 - Alpine Linux Fix](https://github.com/SDhinakar/Cloak-Engine/issues/25)

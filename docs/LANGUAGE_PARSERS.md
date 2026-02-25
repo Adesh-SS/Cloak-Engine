@@ -1298,7 +1298,7 @@ sudo apt install python3  # Linux
 ```typescript
 // Some edge cases may not be parsed correctly
 // File an issue with example code:
-// https://github.com/ntanwir10/CloakScan/issues
+// https://github.com/SDhinakar/Cloak-Engine/issues
 ```
 
 **3. Slow parsing on large files**
@@ -1316,9 +1316,9 @@ const results = await Promise.all(
 
 ## Support
 
-- **Issues**: https://github.com/ntanwir10/CloakScan/issues
-- **Documentation**: https://github.com/ntanwir10/CloakScan/blob/main/README.md
-- **Discussions**: https://github.com/ntanwir10/CloakScan/discussions
+- **Issues**: https://github.com/SDhinakar/Cloak-Engine/issues
+- **Documentation**: https://github.com/SDhinakar/Cloak-Engine/blob/main/README.md
+- **Discussions**: https://github.com/SDhinakar/Cloak-Engine/discussions
 
 ---
 

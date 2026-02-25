@@ -303,7 +303,7 @@ cloakscan init
 
 ## 🆘 Getting Help
 
-- **GitHub Issues**: <https://github.com/ntanwir10/CloakScan/issues>
+- **GitHub Issues**: <https://github.com/SDhinakar/Cloak-Engine/issues>
 - **Documentation**: Check the `docs/` directory
 - **Examples**: See `examples/` directory (if available)
 

@@ -463,5 +463,5 @@ Exported conversations contain:
 ## Getting Help
 
 - **Documentation**: See other guides in `docs/`
-- **Issues**: [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ntanwir10/CloakScan/discussions)
+- **Issues**: [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/SDhinakar/Cloak-Engine/discussions)

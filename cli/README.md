@@ -3,13 +3,13 @@
 **100% Free & Open Source** • Privacy-First Security Scanning and AI Code Review CLI
 
 ```
-  ____ _   _   _    ____  ____    ____   ____    _    _   _            ____ _     ___ 
- / ___| | | | / \  |  _ \|  _ \  / ___| / ___|  / \  | \ | |          / ___| |   |_ _|
-| |  _| | | |/ _ \ | |_) | | | | \___ \| |     / _ \ |  \| |  _____  | |   | |    | |
-| |_| | |_| / ___ \|  _ <| |_| |  ___) | |___ / ___ \| |\  | |_____| | |___| |___ | | 
- \____|\___/_/   \_\_| \_\____/  |____/ \____/_/   \_\_| \_|          \____|_____|___|
+   ___  _     ___    _   _  __   ____   ____    _    _   _ 
+  / __|| |   / _ \  / \ | |/ /  / ___| / ___|  / \  | \ | |
+ | |   | |  | | | |/ _ \| ' /   \___ \| |     / _ \ |  \| |
+ | |__ | |__| |_| / ___ \ . \    ___) | |___ / ___ \| |\  |
+  \___||_____\___/_/   \_\_|\_\  |____/ \____/_/   \_\_| \_|
 
- Privacy-First AI Code Review & Security Scanning
+  Privacy-First AI Code Review & Security Scanning
 ```
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -342,7 +342,7 @@ This will automatically install all required runtime dependencies, including Typ
 
 ```bash
 # Clone repository
-git clone https://github.com/ntanwir10/CloakScan.git
+git clone https://github.com/SDhinakar/Cloak-Engine.git
 cd CloakScan/cli
 
 # Install dependencies
@@ -378,8 +378,8 @@ All other dependencies are automatically managed by npm during installation.
 
 CloakScan is **open source** and we welcome contributions!
 
-- **Report bugs**: [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
-- **Request features**: [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
+- **Report bugs**: [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
+- **Request features**: [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
 - **Submit PRs**: See [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 ---
@@ -439,8 +439,8 @@ CloakScan is built with these amazing open-source tools:
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/ntanwir10/CloakScan/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ntanwir10/CloakScan/discussions)
+- **Issues**: [GitHub Issues](https://github.com/SDhinakar/Cloak-Engine/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/SDhinakar/Cloak-Engine/discussions)
 - **Email**: <support@cloakscan.com> (coming soon)
 
 ---
@@ -449,6 +449,6 @@ CloakScan is built with these amazing open-source tools:
 
 **Made with ❤️ by developers, for developers**
 
-[⭐ Star us on GitHub](https://github.com/ntanwir10/CloakScan) • [🐛 Report Bug](https://github.com/ntanwir10/CloakScan/issues) • [💡 Request Feature](https://github.com/ntanwir10/CloakScan/issues)
+[⭐ Star us on GitHub](https://github.com/SDhinakar/Cloak-Engine) • [🐛 Report Bug](https://github.com/SDhinakar/Cloak-Engine/issues) • [💡 Request Feature](https://github.com/SDhinakar/Cloak-Engine/issues)
 
 </div>

@@ -29,7 +29,7 @@ npm install -g cloakscan
 ### From Source
 
 ```bash
-git clone https://github.com/ntanwir10/CloakScan.git
+git clone https://github.com/SDhinakar/Cloak-Engine.git
 cd CloakScan/cli
 npm install
 npm run build
@@ -394,7 +394,7 @@ done
 ## Getting Help
 
 - Documentation: <https://cloakscancli.com/docs>
-- Issues: <https://github.com/ntanwir10/CloakScan/issues>
+- Issues: <https://github.com/SDhinakar/Cloak-Engine/issues>
 
 ## Next Steps
 
