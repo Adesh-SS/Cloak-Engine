@@ -98,25 +98,25 @@ export async function securityCommand(options: SecurityOptions): Promise<void> {
     };
 
     // Step 3: Generate AI fixes if requested
-    if (options.aiFix && findings.length > 0) {
-      progressBar.update(2, { status: 'Generating AI fixes...' });
-      perfTracker.start('ai-fixes');
-      await generateAIFixes(findings, repoInfo.path, config, options.interactive || false);
-      perfTracker.end('ai-fixes');
-      logger.debug('AI fixes generated', { findingsCount: findings.length });
-      progressBar.update(2.5, { status: 'AI fixes generated' });
-    }
+    // if (options.aiFix && findings.length > 0) {
+    //   progressBar.update(2, { status: 'Generating AI fixes...' });
+    //   perfTracker.start('ai-fixes');
+    //   await generateAIFixes(findings, repoInfo.path, config, options.interactive || false);
+    //   perfTracker.end('ai-fixes');
+    //   logger.debug('AI fixes generated', { findingsCount: findings.length });
+    //   progressBar.update(2.5, { status: 'AI fixes generated' });
+    // }
 
     // Step 4: Generate report
     progressBar.update(2.5, { status: 'Generating report...' });
     perfTracker.start('report-generation');
-    const reportPath = reporter.saveReport(reviewResult, 'markdown', undefined, 'security');
+    // const reportPath = reporter.saveReport(reviewResult, 'markdown', undefined, 'security');
     perfTracker.end('report-generation');
-    logger.debug('Report generated', { reportPath });
+    // logger.debug('Report generated', { reportPath });
     progressBar.update(3, { status: 'Complete' });
     progressBar.stop();
 
-    console.log(chalk.green(`✓ Report saved: ${reportPath}`));
+    // console.log(chalk.green(`✓ Report saved: ${reportPath}`));
 
     // Display summary
     displaySecuritySummary(findings);
