@@ -213,6 +213,7 @@ async function setupCloudAI(config: any): Promise<void> {
     { name: 'Claude (Anthropic)', value: 'claude' },
     { name: 'Gemini (Google)', value: 'gemini' },
     { name: 'OpenRouter (Multi-model)', value: 'openrouter' },
+    { name: 'Groq (Ultra-fast inference)', value: 'groq' },
   ];
 
   const answers = await inquirer.prompt([
@@ -360,6 +361,7 @@ function getEnvVarName(provider: AIProvider): string {
     claude: 'ANTHROPIC_API_KEY',
     gemini: 'GOOGLE_API_KEY',
     openrouter: 'OPENROUTER_API_KEY',
+    groq: 'GROQ_API_KEY',
   };
   return envVars[provider] || 'API_KEY';
 }

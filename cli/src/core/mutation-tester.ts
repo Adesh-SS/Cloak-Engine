@@ -49,35 +49,42 @@ export class MutationTester {
    */
   async runMutationTest(config?: MutationConfig): Promise<MutationResult> {
     const mergedConfig = { ...this.DEFAULT_CONFIG, ...config };
+    
+    // Ensure numeric types
+    if (mergedConfig.threshold) mergedConfig.threshold = Number(mergedConfig.threshold);
+    if (mergedConfig.timeout) mergedConfig.timeout = Number(mergedConfig.timeout);
+    
     const repoPath = process.cwd();
 
-    // Auto-detect framework if needed
+    // Auto-detect framework and project root if needed
     let framework: 'stryker' | 'mutmut' | 'pitest';
-    if (mergedConfig.framework === 'auto') {
-      const detected = this.detectFramework(repoPath);
-      if (!detected) {
+    let executionRoot = repoPath;
+
+    if (mergedConfig.framework === 'auto' || !mergedConfig.framework) {
+      const detection = this.detectFrameworkAndRoot(repoPath);
+      if (!detection) {
         throw new Error('Could not detect mutation testing framework. Please specify framework explicitly.');
       }
-      framework = detected;
-    } else if (mergedConfig.framework) {
-      framework = mergedConfig.framework as 'stryker' | 'mutmut' | 'pitest';
+      framework = detection.framework;
+      executionRoot = detection.projectRoot;
+      console.log(`  Detected ${framework} at ${path.relative(repoPath, executionRoot)}`);
     } else {
-      throw new Error('No mutation testing framework specified.');
+      framework = mergedConfig.framework as 'stryker' | 'mutmut' | 'pitest';
     }
 
     // Check if framework is available
-    if (!this.isFrameworkAvailable(framework)) {
+    if (!this.isFrameworkAvailable(framework, executionRoot)) {
       throw new Error(`${framework} is not installed. Please install it first.`);
     }
 
     // Run mutation testing based on framework
     switch (framework) {
       case 'stryker':
-        return this.runStryker(repoPath, mergedConfig);
+        return this.runStryker(executionRoot, mergedConfig);
       case 'mutmut':
-        return this.runMutmut(repoPath, mergedConfig);
+        return this.runMutmut(executionRoot, mergedConfig);
       case 'pitest':
-        return this.runPitest(repoPath, mergedConfig);
+        return this.runPitest(executionRoot, mergedConfig);
       default:
         throw new Error(`Unsupported framework: ${framework}`);
     }
@@ -245,9 +252,7 @@ export class MutationTester {
         "break": null
       },
       "timeoutMS": config.timeout || 5000,
-      "mutator": {
-        "plugins": config.mutators || ["typescript"]
-      }
+      "checkers": ["typescript"]
     };
 
     const configPath = path.join(repoPath, 'stryker.conf.json');
@@ -487,47 +492,94 @@ export class MutationTester {
   }
 
   /**
-   * Detect mutation testing framework
+   * Detect mutation testing framework and its project root recursively
    */
-  private detectFramework(repoPath: string): 'stryker' | 'mutmut' | 'pitest' | null {
-    // Check for Stryker (JS/TS)
-    const packageJsonPath = path.join(repoPath, 'package.json');
-    if (fs.existsSync(packageJsonPath)) {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-      if (packageJson.devDependencies?.['@stryker-mutator/core']) {
-        return 'stryker';
+  private detectFrameworkAndRoot(repoPath: string): { framework: 'stryker' | 'mutmut' | 'pitest', projectRoot: string } | null {
+    // Files to look for and their respective frameworks
+    const markers = [
+      { file: 'package.json', framework: 'stryker' as const },
+      { file: 'requirements.txt', framework: 'mutmut' as const },
+      { file: 'pyproject.toml', framework: 'mutmut' as const },
+      { file: 'pom.xml', framework: 'pitest' as const },
+      { file: 'build.gradle', framework: 'pitest' as const },
+      { file: 'build.gradle.kts', framework: 'pitest' as const }
+    ];
+
+    // Priority 1: Check current directory
+    for (const marker of markers) {
+      const markerPath = path.join(repoPath, marker.file);
+      if (fs.existsSync(markerPath)) {
+        // Special check for package.json content to verify it's a JS/TS project
+        if (marker.file === 'package.json') {
+          try {
+            const pkg = JSON.parse(fs.readFileSync(markerPath, 'utf-8'));
+            if (pkg.devDependencies?.['@stryker-mutator/core'] || pkg.dependencies?.['@stryker-mutator/core']) {
+              return { framework: 'stryker', projectRoot: repoPath };
+            }
+          } catch { /* Ignore parse errors */ }
+        } else {
+          return { framework: marker.framework, projectRoot: repoPath };
+        }
       }
     }
 
-    // Check for mutmut (Python)
-    const requirementsPath = path.join(repoPath, 'requirements.txt');
-    if (fs.existsSync(requirementsPath)) {
-      const requirements = fs.readFileSync(requirementsPath, 'utf-8');
-      if (requirements.includes('mutmut')) {
-        return 'mutmut';
-      }
-    }
+    // Priority 2: Recursive search (excluding noise)
+    const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'build', 'out', '.next', 'coverage', 'venv', '.venv']);
+    
+    const findRecursively = (dir: string): { framework: 'stryker' | 'mutmut' | 'pitest', projectRoot: string } | null => {
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        
+        // Check files in this directory first
+        for (const marker of markers) {
+          const entry = entries.find(e => e.name === marker.file);
+          if (entry && !entry.isDirectory()) {
+            const fullPath = path.join(dir, marker.file);
+            if (marker.file === 'package.json') {
+              try {
+                const pkg = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+                if (pkg.devDependencies?.['@stryker-mutator/core'] || pkg.dependencies?.['@stryker-mutator/core']) {
+                  return { framework: 'stryker', projectRoot: dir };
+                }
+              } catch { /* Ignore */ }
+            } else {
+              return { framework: marker.framework, projectRoot: dir };
+            }
+          }
+        }
 
-    // Check for PITest (Java)
-    const pomPath = path.join(repoPath, 'pom.xml');
-    if (fs.existsSync(pomPath)) {
-      const pom = fs.readFileSync(pomPath, 'utf-8');
-      if (pom.includes('pitest-maven')) {
-        return 'pitest';
-      }
-    }
+        // Search subdirectories
+        for (const entry of entries) {
+          if (entry.isDirectory() && !SKIP_DIRS.has(entry.name)) {
+            const result = findRecursively(path.join(dir, entry.name));
+            if (result) return result;
+          }
+        }
+      } catch { /* Ignore errors */ }
+      return null;
+    };
 
-    const gradlePath = path.join(repoPath, 'build.gradle');
-    if (fs.existsSync(gradlePath)) {
-      const gradle = fs.readFileSync(gradlePath, 'utf-8');
-      if (gradle.includes('pitest')) {
-        return 'pitest';
-      }
-    }
+    const result = findRecursively(repoPath);
+    if (result) return result;
 
-    // Default to stryker if package.json exists (can be installed)
-    if (fs.existsSync(packageJsonPath)) {
-      return 'stryker';
+    // Priority 3: Last resort, pick first package.json found even without stryker dep
+    const findAnyPackageJson = (dir: string): string | null => {
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        if (entries.find(e => e.name === 'package.json')) return dir;
+        for (const entry of entries) {
+          if (entry.isDirectory() && !SKIP_DIRS.has(entry.name)) {
+            const found = findAnyPackageJson(path.join(dir, entry.name));
+            if (found) return found;
+          }
+        }
+      } catch { /* Ignore */ }
+      return null;
+    };
+
+    const anyPkgRoot = findAnyPackageJson(repoPath);
+    if (anyPkgRoot) {
+      return { framework: 'stryker', projectRoot: anyPkgRoot };
     }
 
     return null;
@@ -536,22 +588,22 @@ export class MutationTester {
   /**
    * Check if framework is available
    */
-  private isFrameworkAvailable(framework: 'stryker' | 'mutmut' | 'pitest'): boolean {
+  private isFrameworkAvailable(framework: 'stryker' | 'mutmut' | 'pitest', repoPath: string): boolean {
     try {
       switch (framework) {
         case 'stryker':
-          execSync('npx stryker --version', { stdio: 'ignore' });
+          execSync('npx stryker --version', { cwd: repoPath, stdio: 'ignore' });
           return true;
         case 'mutmut':
-          execSync('mutmut --version', { stdio: 'ignore' });
+          execSync('mutmut --version', { cwd: repoPath, stdio: 'ignore' });
           return true;
         case 'pitest':
           // PITest is a Maven/Gradle plugin, check if build tool exists
           try {
-            execSync('mvn --version', { stdio: 'ignore' });
+            execSync('mvn --version', { cwd: repoPath, stdio: 'ignore' });
             return true;
           } catch {
-            execSync('./gradlew --version', { stdio: 'ignore' });
+            execSync('./gradlew --version', { cwd: repoPath, stdio: 'ignore' });
             return true;
           }
         default:

@@ -435,8 +435,7 @@ export class TestRunner {
         const items = fs.readdirSync(currentDir);
         for (const item of items) {
           // Skip common directories that don't contain tests
-          if (item === 'node_modules' || item === '.git' || item === 'dist' ||
-              item === 'build' || item === '.next' || item === 'coverage') {
+          if (['node_modules', '.git', 'vendor', 'dist', 'build', 'coverage', '.next', '.nuxt', 'out', '.idea', '.vscode'].includes(item)) {
             continue;
           }
 

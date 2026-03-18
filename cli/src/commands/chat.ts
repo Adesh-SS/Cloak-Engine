@@ -169,7 +169,8 @@ export async function chatCommand(options: ChatCommandOptions): Promise<void> {
           config.provider,
           config.apiKey,
           config.apiEndpoint,
-          config.embeddingFallback
+          config.embeddingFallback,
+          config.embeddingApiKey
         );
         embeddingProvider = embeddingResult.provider;
       } catch (error: any) {

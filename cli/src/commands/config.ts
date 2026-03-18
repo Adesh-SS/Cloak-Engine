@@ -86,7 +86,7 @@ function showConfig(): void {
   console.log(chalk.cyan.bold("1. Operation Mode"));
   const modeDescription =
     mode === "cloud"
-      ? "AI-Enhanced Reviews mode uses cloud-based AI providers (OpenAI, Claude, Gemini, or OpenRouter) to perform intelligent code analysis, security scanning, and automated code reviews. This mode requires an internet connection and API keys."
+      ? "AI-Enhanced Reviews mode uses cloud-based AI providers (OpenAI, Claude, Gemini, OpenRouter, or Groq) to perform intelligent code analysis, security scanning, and automated code reviews. This mode requires an internet connection and API keys."
       : mode === "local"
       ? "Local AI mode uses locally running AI models via Ollama or LM Studio. This provides privacy and cost savings by processing code analysis entirely on your machine without sending data to external services."
       : "Static Analysis Only mode performs code analysis using built-in static analysis tools without any AI assistance. This mode works completely offline and doesn't require any API keys or internet connection.";
@@ -115,6 +115,8 @@ function showConfig(): void {
         ? "Gemini (Google) provides multimodal AI models (Gemini 2.5 Flash, 2.5 Pro, 3 Pro) with excellent code understanding and generation."
         : config.provider === "openrouter"
         ? "OpenRouter provides access to multiple AI models from various providers through a unified API interface."
+        : config.provider === "groq"
+        ? "Groq provides ultra-fast AI inference with models like Llama and Compound, optimized for speed and low latency."
         : config.provider === "ollama"
         ? "Ollama runs AI models locally on your machine, providing complete privacy and no API costs."
         : config.provider === "lmstudio"
@@ -292,12 +294,13 @@ function directConfig(options: ConfigOptions): void {
       config.embeddingFallback = undefined;
     } else if (
       options.embeddingFallback === "ollama" ||
-      options.embeddingFallback === "lmstudio"
+      options.embeddingFallback === "lmstudio" ||
+      options.embeddingFallback === "gemini"
     ) {
       config.embeddingFallback = options.embeddingFallback;
     } else {
       throw new Error(
-        `Invalid embedding fallback: ${options.embeddingFallback}. Must be 'ollama', 'lmstudio', or 'none'`
+        `Invalid embedding fallback: ${options.embeddingFallback}. Must be 'ollama', 'lmstudio', 'gemini', or 'none'`
       );
     }
     logger.debug("Embedding fallback updated", {
@@ -395,6 +398,7 @@ async function configureModeSettings(
       { name: "Claude (Anthropic)", value: "claude" },
       { name: "Gemini (Google)", value: "gemini" },
       { name: "OpenRouter (Multi-model)", value: "openrouter" },
+      { name: "Groq (Ultra-fast inference)", value: "groq" },
     ];
 
     const providerAnswers = await inquirer.prompt([
@@ -490,6 +494,104 @@ async function configureModeSettings(
           default: config.model || "claude-sonnet-4.5",
         },
       ]);
+    } else if (providerAnswers.provider === "openrouter") {
+      const openRouterChoices = [
+        {
+          name: "Qwen3 Next 80B A3B Instruct (Free, powerful reasoning)",
+          value: "qwen/qwen3-next-80b-a3b-instruct:free",
+        },
+        {
+          name: "DeepSeek R1 0528 (Free, strong coding model)",
+          value: "deepseek/deepseek-r1-0528:free",
+        },
+        {
+          name: "Llama 4 Maverick (Free, Meta's latest)",
+          value: "meta-llama/llama-4-maverick:free",
+        },
+        {
+          name: "Gemini 2.5 Flash (Free, Google's fast model)",
+          value: "google/gemini-2.5-flash-preview:free",
+        },
+        {
+          name: "Other (Enter custom model ID)",
+          value: "__custom__",
+        },
+      ];
+
+      const openRouterModelAnswer = await inquirer.prompt([
+        {
+          type: "list",
+          name: "model",
+          message: "Select OpenRouter model:",
+          choices: openRouterChoices,
+          default: config.model || "qwen/qwen3-next-80b-a3b-instruct:free",
+        },
+      ]);
+
+      if (openRouterModelAnswer.model === "__custom__") {
+        const customModelAnswer = await inquirer.prompt([
+          {
+            type: "input",
+            name: "model",
+            message: "Enter OpenRouter model ID (e.g. qwen/qwen3-next-80b-a3b-instruct:free):",
+            validate: (input: string) => input.trim().length > 0 ? true : "Model ID is required",
+          },
+        ]);
+        modelAnswer = { model: customModelAnswer.model.trim() };
+      } else {
+        modelAnswer = { model: openRouterModelAnswer.model };
+      }
+    } else if (providerAnswers.provider === "groq") {
+      const groqChoices = [
+        {
+          name: "Llama 3.1 8B Instant (Free, ultra-fast)",
+          value: "llama-3.1-8b-instant",
+        },
+        {
+          name: "Llama 3.3 70B Versatile (Powerful, general purpose)",
+          value: "llama-3.3-70b-versatile",
+        },
+        {
+          name: "Groq Compound (Multi-step reasoning)",
+          value: "groq/compound",
+        },
+        {
+          name: "Groq Compound Mini (Fast multi-step reasoning)",
+          value: "groq/compound-mini",
+        },
+        {
+          name: "Qwen QWQ 32B (Strong reasoning)",
+          value: "qwen/qwen3-32b",
+        },
+        {
+          name: "Other (Enter custom model ID)",
+          value: "__custom__",
+        },
+      ];
+
+      const groqModelAnswer = await inquirer.prompt([
+        {
+          type: "list",
+          name: "model",
+          message: "Select Groq model:",
+          choices: groqChoices,
+          default: config.model || "llama-3.1-8b-instant",
+        },
+      ]);
+
+      if (groqModelAnswer.model === "__custom__") {
+        const customModelAnswer = await inquirer.prompt([
+          {
+            type: "input",
+            name: "model",
+            message: "Enter Groq model ID (e.g. llama-3.1-8b-instant):",
+            validate: (input: string) => input.trim().length > 0 ? true : "Model ID is required",
+          },
+        ]);
+        modelAnswer = { model: customModelAnswer.model.trim() };
+      } else {
+        modelAnswer = { model: groqModelAnswer.model };
+      }
     }
 
     const answers = await inquirer.prompt([
@@ -506,6 +608,7 @@ async function configureModeSettings(
         message: "Choose embedding provider:",
         choices: [
           { name: "Use native provider (if available)", value: "none" },
+          { name: "Gemini (free, online - recommended)", value: "gemini" },
           { name: "Ollama (local, free)", value: "ollama" },
           { name: "LM Studio (local)", value: "lmstudio" },
         ],
@@ -537,13 +640,33 @@ async function configureModeSettings(
     config.telemetryEnabled = answers.telemetry;
     config.offlineMode = answers.offlineMode;
 
-    // Show explanation about embeddings
-    if (answers.embeddingFallback !== "none") {
+    // If Gemini embedding is selected, ask for API key
+    if (answers.embeddingFallback === "gemini") {
+      const geminiKeyAnswers = await inquirer.prompt([
+        {
+          type: "password",
+          name: "embeddingApiKey",
+          message: "Enter Google API key for Gemini embeddings (free at aistudio.google.com):",
+          mask: "*",
+          default: config.embeddingApiKey,
+          validate: (input: string) => input.trim().length > 0 ? true : "Google API key is required for Gemini embeddings",
+        },
+      ]);
+      config.embeddingApiKey = geminiKeyAnswers.embeddingApiKey || undefined;
+      console.log(
+        chalk.gray(
+          "\n💡 Embeddings are used for code search. Using Gemini (free, online) for embeddings."
+        )
+      );
+    } else if (answers.embeddingFallback !== "none") {
+      config.embeddingApiKey = undefined;
       console.log(
         chalk.gray(
           "\n💡 Embeddings are used for code search. Using local provider for privacy and cost savings."
         )
       );
+    } else {
+      config.embeddingApiKey = undefined;
     }
 
     // Test connection (model is already set in config above)

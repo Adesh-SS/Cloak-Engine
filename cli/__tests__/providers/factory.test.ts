@@ -50,6 +50,11 @@ describe("ProviderFactory", () => {
       expect(provider).toBeInstanceOf(OpenAIProvider);
     });
 
+    it("should create Groq provider (OpenAI-compatible)", () => {
+      const provider = ProviderFactory.create("groq", "test-key");
+      expect(provider).toBeInstanceOf(OpenAIProvider);
+    });
+
     it("should throw error for unknown provider", () => {
       expect(() => {
         ProviderFactory.create("unknown" as any, "test-key");
@@ -67,7 +72,8 @@ describe("ProviderFactory", () => {
       expect(providers).toContain("ollama");
       expect(providers).toContain("lmstudio");
       expect(providers).toContain("openrouter");
-      expect(providers).toHaveLength(6);
+      expect(providers).toContain("groq");
+      expect(providers).toHaveLength(7);
     });
   });
 });

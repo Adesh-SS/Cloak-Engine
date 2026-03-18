@@ -451,7 +451,7 @@ export class FileBasedEmbeddingStore implements EmbeddingStore {
         return 'text-embedding-3-small (OpenAI)';
       }
       if (provider.includes('gemini')) {
-        return 'text-embedding-004 (Gemini)';
+        return 'embedding-001 (Gemini)';
       }
       if (provider.includes('ollama')) {
         return 'nomic-embed-text (Ollama)';
@@ -464,6 +464,9 @@ export class FileBasedEmbeddingStore implements EmbeddingStore {
       }
       if (provider.includes('openrouter')) {
         return 'text-embedding-3-small (OpenRouter)';
+      }
+      if (provider.includes('groq')) {
+        return 'text-embedding-3-small (Groq)';
       }
     }
 

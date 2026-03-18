@@ -121,10 +121,10 @@ program
     "Mutation framework (stryker, mutmut, pitest, auto)",
     "auto"
   )
-  .option("--threshold <number>", "Minimum mutation score (0-100)", "80")
+  .option("--threshold <number>", "Minimum mutation score (0-100)", (val) => parseInt(val), 80)
   .option("--files <files>", "Comma-separated list of files to mutate")
   .option("--test-command <command>", "Custom test command")
-  .option("--timeout <ms>", "Timeout per test in milliseconds", "5000")
+  .option("--timeout <ms>", "Timeout per test in milliseconds", (val) => parseInt(val), 5000)
   .action(mutationCommand);
 
 program
@@ -187,8 +187,7 @@ program
   )
   .option(
     "-t, --type <type>",
-    "Target type: function, class, file, module",
-    "function"
+    "Target type: function, class, file, module"
   )
   .option("-o, --output <path>", "Save explanation to file")
   .action(explainCommand);
@@ -230,7 +229,7 @@ program
   .command("chat")
   .description("Interactive AI chat about your codebase (Phase 4 RAG feature)")
   .option("-m, --model <model>", "Override AI model")
-  .option("-t, --temperature <temp>", "Temperature 0-1", "0.7")
+  .option("-t, --temperature <temp>", "Temperature 0-1", parseFloat, 0.7)
   .option("--rebuild", "Rebuild embeddings index")
   .option(
     "--embedding-provider <provider>",

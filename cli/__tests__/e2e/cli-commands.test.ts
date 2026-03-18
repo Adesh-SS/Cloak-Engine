@@ -54,10 +54,10 @@ function complexFunction(x) {
     // Initialize CloakScan config for the test project to avoid ENOENT errors
     try {
       execSync(
-        `node ${path.join(
+        `node "${path.join(
           __dirname,
           "../../dist/index.js"
-        )} init --no-telemetry`,
+        )}" init --no-telemetry`,
         {
           cwd: tempDir,
           encoding: "utf-8",
@@ -82,10 +82,10 @@ function complexFunction(x) {
     it("should run security scan successfully", () => {
       try {
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} security --no-telemetry`,
+          )}" security --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -107,10 +107,10 @@ function complexFunction(x) {
     it("should accept --debug flag without error", () => {
       try {
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} security --debug --no-telemetry`,
+          )}" security --debug --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -137,10 +137,10 @@ function complexFunction(x) {
 
       try {
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} sbom -f spdx -o ${sbomPath} --no-telemetry`,
+          )}" sbom -f spdx -o "${sbomPath}" --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -176,10 +176,10 @@ function complexFunction(x) {
 
       try {
         execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} init --no-telemetry`,
+          )}" init --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -203,10 +203,10 @@ function complexFunction(x) {
     it("should show status information", () => {
       try {
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} status --no-telemetry`,
+          )}" status --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -227,10 +227,10 @@ function complexFunction(x) {
     it("should count lines of code", () => {
       try {
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} run --no-telemetry`,
+          )}" run --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",
@@ -262,10 +262,10 @@ function complexFunction(x) {
         }
 
         const output = execSync(
-          `node ${path.join(
+          `node "${path.join(
             __dirname,
             "../../dist/index.js"
-          )} commit --no-body --no-telemetry`,
+          )}" commit --no-body --no-telemetry`,
           {
             cwd: tempDir,
             encoding: "utf-8",

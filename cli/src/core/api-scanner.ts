@@ -47,7 +47,7 @@ export class APIScanner {
       try {
         const items = fs.readdirSync(currentDir);
         for (const item of items) {
-          if (item === 'node_modules' || item === '.git' || item === 'vendor') continue;
+          if (['node_modules', '.git', 'vendor', 'dist', 'build', 'coverage', '.next', '.nuxt', 'out', '.idea', '.vscode'].includes(item)) continue;
 
           const fullPath = path.join(currentDir, item);
           const stat = fs.statSync(fullPath);

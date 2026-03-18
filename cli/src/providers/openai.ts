@@ -12,11 +12,14 @@ export class OpenAIProvider extends AIProvider {
   private client: OpenAI;
   private defaultModel = 'gpt-4o';
   private defaultEmbeddingModel = 'text-embedding-3-small';
+  private baseURL?: string;
 
-  constructor(apiKey?: string, model?: string) {
+  constructor(apiKey?: string, model?: string, endpoint?: string) {
     super(apiKey);
+    this.baseURL = endpoint || process.env.OPENAI_BASE_URL;
     this.client = new OpenAI({
       apiKey: apiKey || process.env.OPENAI_API_KEY,
+      baseURL: this.baseURL,
     });
     if (model) {
       this.defaultModel = model;
@@ -62,15 +65,30 @@ export class OpenAIProvider extends AIProvider {
   }
 
   getName(): string {
+    if (this.baseURL && this.baseURL.includes('openrouter.ai')) {
+      return 'OpenRouter';
+    }
+    if (this.baseURL && this.baseURL.includes('groq.com')) {
+      return 'Groq';
+    }
     return 'OpenAI';
   }
 
   async testConnection(): Promise<boolean> {
     try {
+      if (this.baseURL && (this.baseURL.includes('openrouter.ai') || this.baseURL.includes('groq.com'))) {
+        // For OpenRouter/Groq, use the models endpoint to avoid rate limits on free models
+        const response = await this.client.models.list();
+        // If we get here without error, the API key is valid
+        return true;
+      }
+      // For regular OpenAI, test with a small chat request
       await this.chat([{ role: 'user', content: 'test' }], { maxTokens: 10 });
       return true;
-    } catch {
-      return false;
+    } catch (error: any) {
+      // Re-throw with useful message so the caller can display it
+      const message = error?.message || error?.error?.message || String(error);
+      throw new Error(`Connection failed: ${message}`);
     }
   }
 

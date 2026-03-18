@@ -13,14 +13,14 @@ import { OllamaEmbeddingProvider } from "./embedding-ollama";
 import { LMStudioEmbeddingProvider } from "./embedding-lmstudio";
 import { AIProvider } from "../core/config";
 
-export type EmbeddingFallbackProvider = "ollama" | "lmstudio" | "none";
+export type EmbeddingFallbackProvider = "ollama" | "lmstudio" | "gemini" | "none";
 
 export interface EmbeddingProviderResult {
   provider: EmbeddingProvider;
   isFallback: boolean;
   fallbackReason?: string;
   dimensions: number;
-  fallbackProvider?: "ollama" | "lmstudio";
+  fallbackProvider?: "ollama" | "lmstudio" | "gemini";
 }
 
 export class EmbeddingProviderFactory {
@@ -31,21 +31,30 @@ export class EmbeddingProviderFactory {
     aiProvider: AIProvider,
     apiKey?: string,
     apiEndpoint?: string,
-    embeddingFallback?: EmbeddingFallbackProvider
+    embeddingFallback?: EmbeddingFallbackProvider,
+    embeddingApiKey?: string
   ): EmbeddingProviderResult {
     let provider: EmbeddingProvider;
     let isFallback = false;
     let fallbackReason: string | undefined;
     let dimensions: number;
-    let fallbackProvider: "ollama" | "lmstudio" | undefined;
+    let fallbackProvider: "ollama" | "lmstudio" | "gemini" | undefined;
 
     // Handle fallback override first (if user explicitly chose fallback)
-    if (embeddingFallback === "ollama" || embeddingFallback === "lmstudio") {
-      // User wants to use local provider regardless of AI provider
+    if (embeddingFallback === "ollama" || embeddingFallback === "lmstudio" || embeddingFallback === "gemini") {
+      // User wants to use a specific provider regardless of AI provider
       if (embeddingFallback === "lmstudio") {
         provider = new LMStudioEmbeddingProvider(apiEndpoint);
         dimensions = 768;
         fallbackProvider = "lmstudio";
+      } else if (embeddingFallback === "gemini") {
+        const geminiKey = embeddingApiKey || process.env.GOOGLE_API_KEY;
+        if (!geminiKey) {
+          throw new Error("Google API key required for Gemini embeddings. Set it via cloakscan config or GOOGLE_API_KEY env variable.");
+        }
+        provider = new GeminiEmbeddingProvider(geminiKey);
+        dimensions = 768;
+        fallbackProvider = "gemini";
       } else {
         provider = new OllamaEmbeddingProvider(apiEndpoint);
         dimensions = 768;
@@ -123,7 +132,7 @@ export class EmbeddingProviderFactory {
         if (embeddingFallback === "none" || embeddingFallback === undefined) {
           // Use OpenAI-compatible embeddings via OpenRouter
           if (!apiKey) {
-            throw new Error("OpenRouter API key required for embeddings");
+            throw new Error(`${aiProvider} API key required for embeddings`);
           }
           provider = new OpenAIEmbeddingProvider(
             apiKey,
@@ -133,9 +142,18 @@ export class EmbeddingProviderFactory {
         } else {
           // Should not reach here due to earlier check, but handle gracefully
           throw new Error(
-            `Invalid fallback option for OpenRouter: ${embeddingFallback}`
+            `Invalid fallback option for ${aiProvider}: ${embeddingFallback}`
           );
         }
+        break;
+
+      case "groq":
+        // Groq doesn't support embeddings natively - use local fallback
+        isFallback = true;
+        fallbackProvider = "ollama"; // Default to Ollama for Groq
+        provider = new OllamaEmbeddingProvider(apiEndpoint);
+        dimensions = 768;
+        fallbackReason = `Groq does not support embeddings natively. Using Ollama (local, free) for embeddings.`;
         break;
 
       case "none":
@@ -187,6 +205,7 @@ export class EmbeddingProviderFactory {
       case "ollama":
       case "lmstudio":
       case "claude": // Claude uses fallback, which is 768
+      case "groq":  // Groq uses fallback, which is 768
         return 768;
       default:
         return 768; // Default for 'none' or unknown

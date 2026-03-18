@@ -215,7 +215,7 @@ export class RefactoringSuggestionsEngine {
     // Validate TypeScript is available before creating ASTParser
     const { ensureTypeScript } = require("../utils/dependency-checker");
     ensureTypeScript();
-    
+
     this.parser = new ASTParser();
     this.indexer = new CodebaseIndexer(repoRoot, repoId);
     this.cache = new AICache(repoId);
@@ -418,11 +418,12 @@ export class RefactoringSuggestionsEngine {
       maxTokens: 2000
     });
 
-    // Parse AI response (expecting JSON)
+    // Parse AI response (expecting JSON, may be wrapped in markdown code blocks)
     try {
-      const aiSuggestions = JSON.parse(response.content);
+      const cleanedContent = this.stripMarkdownCodeBlocks(response.content);
+      const aiSuggestions = JSON.parse(cleanedContent);
       suggestions.push(...aiSuggestions);
-      await this.cache.set(cacheKey, this.aiProvider.getName(), response.content, [targetPath]);
+      await this.cache.set(cacheKey, this.aiProvider.getName(), cleanedContent, [targetPath]);
     } catch (error) {
       console.error('Failed to parse pattern suggestions:', error);
     }
@@ -566,6 +567,18 @@ export class RefactoringSuggestionsEngine {
   // Helper Methods
   // ============================================================================
 
+  /**
+   * Strip markdown code blocks from AI responses (e.g. ```json ... ```)
+   */
+  private stripMarkdownCodeBlocks(text: string): string {
+    // Match ```json ... ``` or ``` ... ```
+    const match = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+    if (match) {
+      return match[1].trim();
+    }
+    return text.trim();
+  }
+
   private extractCode(content: string, startLine: number, endLine: number): string {
     const lines = content.split('\n');
     return lines.slice(startLine - 1, endLine).join('\n');
@@ -644,7 +657,8 @@ Provide refactored code in JSON format:
 
   private parseRefactoredResponse(response: string, file: string, smell: CodeSmell): RefactoredCode {
     try {
-      const parsed = JSON.parse(response);
+      const cleaned = this.stripMarkdownCodeBlocks(response);
+      const parsed = JSON.parse(cleaned);
       return {
         original: {
           file,

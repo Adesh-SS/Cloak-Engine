@@ -11,7 +11,8 @@ export interface Config {
   apiKey?: string;
   apiEndpoint?: string;
   model?: string; // AI model name (e.g., "gemini-2.5-flash", "gpt-4o", "claude-sonnet-4.5")
-  embeddingFallback?: 'ollama' | 'lmstudio' | 'none';
+  embeddingFallback?: 'ollama' | 'lmstudio' | 'gemini' | 'none';
+  embeddingApiKey?: string; // Separate API key for embedding provider (e.g. Gemini API key when using Groq for chat)
   telemetryEnabled: boolean;
   offlineMode: boolean;
   createdAt: string;
@@ -25,6 +26,7 @@ export type AIProvider =
   | "ollama"
   | "lmstudio"
   | "openrouter"
+  | "groq"
   | "none";
 
 export class ConfigManager {

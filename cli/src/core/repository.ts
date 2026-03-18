@@ -18,10 +18,10 @@ export class RepositoryManager {
    * Get repository information from current directory
    */
   getRepoInfo(repoPath: string = process.cwd()): RepositoryInfo {
-    const isGit = this.isGitRepo(repoPath);
+    const gitRoot = this.findGitRoot(repoPath);
 
-    if (isGit) {
-      return this.getGitRepoInfo(repoPath);
+    if (gitRoot) {
+      return this.getGitRepoInfo(gitRoot);
     } else {
       return this.getFallbackRepoInfo(repoPath);
     }
@@ -31,11 +31,29 @@ export class RepositoryManager {
    * Check if directory is a git repository
    */
   private isGitRepo(repoPath: string): boolean {
+    return this.findGitRoot(repoPath) !== null;
+  }
+
+  /**
+   * Find the git root by walking up the directory tree
+   */
+  private findGitRoot(startPath: string): string | null {
     try {
-      const gitDir = path.join(repoPath, '.git');
-      return fs.existsSync(gitDir);
+      let currentPath = path.resolve(startPath);
+      while (true) {
+        const gitDir = path.join(currentPath, '.git');
+        if (fs.existsSync(gitDir)) {
+          return currentPath;
+        }
+        const parentPath = path.dirname(currentPath);
+        if (parentPath === currentPath) {
+          // Reached filesystem root
+          return null;
+        }
+        currentPath = parentPath;
+      }
     } catch {
-      return false;
+      return null;
     }
   }
 

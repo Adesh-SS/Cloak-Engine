@@ -31,7 +31,10 @@ export class CodeSmellDetector {
     }
 
     // Detect duplicates across files
-    smells.push(...this.detectDuplicateCode(fileContents));
+    const duplicateSmells = this.detectDuplicateCode(fileContents);
+    for (const smell of duplicateSmells) {
+      smells.push(smell);
+    }
 
     // Detect smells in individual files
     for (const [file, content] of fileContents) {
@@ -47,7 +50,10 @@ export class CodeSmellDetector {
     }
 
     // Detect circular dependencies (needs multiple files)
-    smells.push(...this.detectCircularDependencies(fileContents));
+    const circularSmells = this.detectCircularDependencies(fileContents);
+    for (const smell of circularSmells) {
+      smells.push(smell);
+    }
 
     return smells;
   }
@@ -64,7 +70,7 @@ export class CodeSmellDetector {
       try {
         const items = fs.readdirSync(currentDir);
         for (const item of items) {
-          if (item === 'node_modules' || item === '.git' || item === 'vendor' || item === 'dist') continue;
+          if (['node_modules', '.git', 'vendor', 'dist', 'build', 'coverage', '.next', '.nuxt', 'out', '.idea', '.vscode'].includes(item)) continue;
 
           const fullPath = path.join(currentDir, item);
           const stat = fs.statSync(fullPath);
