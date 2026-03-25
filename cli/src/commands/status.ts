@@ -34,35 +34,34 @@ export async function statusCommand(): Promise<void> {
     }
 
     // Display configuration
-    console.log(chalk.white.bold('Configuration:'));
-    console.log(chalk.gray(`  Client ID: ${config.clientId}`));
-    console.log(chalk.gray(`  Provider: ${config.provider}`));
-    console.log(chalk.gray(`  Telemetry: ${config.telemetryEnabled ? 'Enabled' : 'Disabled'}`));
-    console.log(chalk.gray(`  Offline Mode: ${config.offlineMode ? 'Yes' : 'No'}`));
+    console.log(chalk.cyan.bold('⚙️  Configuration:'));
+    console.log(chalk.gray(`  Client ID:   `) + chalk.white(config.clientId));
+    console.log(chalk.gray(`  Provider:    `) + chalk.white(config.provider));
+    console.log(chalk.gray(`  Telemetry:   `) + chalk.white(config.telemetryEnabled ? 'Enabled' : 'Disabled'));
+    console.log(chalk.gray(`  Offline Mode:`) + chalk.white(config.offlineMode ? 'Yes' : 'No'));
 
     // Display repository info
     if (repoInfo) {
-      console.log(chalk.white.bold('\nRepository:'));
-      console.log(chalk.gray(`  Name: ${repoInfo.name}`));
-      console.log(chalk.gray(`  Path: ${repoInfo.path}`));
-      console.log(chalk.gray(`  Type: ${repoInfo.isGit ? 'Git' : 'Standard'}`));
+      console.log(chalk.cyan.bold('\n📁 Repository:'));
+      console.log(chalk.gray(`  Name:    `) + chalk.white(repoInfo.name));
+      console.log(chalk.gray(`  Path:    `) + chalk.white(repoInfo.path));
+      console.log(chalk.gray(`  Type:    `) + chalk.white(repoInfo.isGit ? 'Git' : 'Standard'));
       if (repoInfo.branch) {
-        console.log(chalk.gray(`  Branch: ${repoInfo.branch}`));
+        console.log(chalk.gray(`  Branch:  `) + chalk.white(repoInfo.branch));
       }
-      console.log(chalk.gray(`  Repo ID: ${repoInfo.repoId}`));
+      console.log(chalk.gray(`  Repo ID: `) + chalk.white(repoInfo.repoId));
     }
 
     // Check network connectivity
-    console.log(chalk.white.bold('\nConnectivity:'));
+    console.log(chalk.cyan.bold('\n🌐 Connectivity:'));
     const online = await isOnline();
-    console.log(chalk.gray(`  Internet: ${online ? chalk.green('Connected') : chalk.red('Offline')}`));
+    console.log(chalk.gray(`  Internet: `) + (online ? chalk.green('Connected') : chalk.red('Offline')));
 
     // CloakScan is now 100% free and open source!
-    console.log(chalk.white.bold('\nLicense:'));
-    console.log(chalk.green('  ✓ CloakScan is 100% free and open source'));
+    console.log(chalk.cyan.bold('\n📄 License:'));
     console.log(chalk.gray('  ✓ Unlimited static analysis (offline)'));
     console.log(chalk.gray('  ✓ AI review with your own API key (BYOK)'));
-    console.log(chalk.gray('  ✓ No usage limits or subscriptions'))
+    console.log(chalk.gray('  ✓ No usage limits or subscriptions'));
 
     console.log();
   } catch (error) {

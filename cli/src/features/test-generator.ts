@@ -138,7 +138,7 @@ export class TestGenerator {
     );
 
     // Determine test path
-    const testPath = this.getTestPath(func.file, framework);
+    const testPath = this.getTestPath(func.file, framework, options);
 
     // Validate generated tests
     const validation = await this.validateTestCode(testCode, framework);
@@ -208,7 +208,7 @@ export class TestGenerator {
     );
 
     // Determine test path
-    const testPath = this.getTestPath(cls.file, framework);
+    const testPath = this.getTestPath(cls.file, framework, options);
 
     // Validate generated tests
     const validation = await this.validateTestCode(testCode, framework);
@@ -594,13 +594,22 @@ def test_example_function_edge_cases():
   /**
    * Get test path for a source file
    */
-  private getTestPath(sourceFile: string, framework: TestFramework): string {
-    const relativePath = path.relative(this.repoRoot, sourceFile);
-    const dir = path.dirname(relativePath);
+  private getTestPath(sourceFile: string, framework: TestFramework, options?: TestGenerationOptions): string {
     const basename = path.basename(sourceFile, path.extname(sourceFile));
-
     const extension = framework === 'pytest' ? '.py' : path.extname(sourceFile);
     const testSuffix = framework === 'pytest' ? 'test_' : '.test';
+
+    // If output dir is specified, use it directly
+    if (options && options.outputDir) {
+      if (framework === 'pytest') {
+        return path.join(options.outputDir, `${testSuffix}${basename}${extension}`);
+      } else {
+        return path.join(options.outputDir, `${basename}${testSuffix}${extension}`);
+      }
+    }
+
+    const relativePath = path.relative(this.repoRoot, sourceFile);
+    const dir = path.dirname(relativePath);
 
     // Try __tests__ directory first
     const testsDir = path.join(this.repoRoot, dir, '__tests__');

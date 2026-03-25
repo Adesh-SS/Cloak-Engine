@@ -571,20 +571,22 @@ export class DocsGenerator {
     const messages: AIMessage[] = [
       {
         role: 'system',
-        content: `You are a technical documentation expert. Generate a comprehensive, well-structured README.md file for the project based on the provided context.
+        content: `You are a technical documentation expert. Generate a stunning, comprehensive, well-structured README.md file for the project based on the provided context.
 
 Include the following sections:
-1. Project Title and Description
-2. Features (key capabilities)
-3. Installation
-4. Quick Start / Usage
-5. Configuration (if applicable)
-6. Examples (if includeExamples is true)
-7. Contributing
-8. License
+1. Project Title, Description, and Badges (version, license, build status)
+2. Table of Contents
+3. Features (key capabilities)
+4. Project Structure (a tree view or brief outline)
+5. Prerequisites and Installation
+6. Quick Start / Usage
+7. Configuration (if applicable)
+8. Examples (if includeExamples is true)
+9. Contributing Guidelines
+10. License
 
-Use proper Markdown formatting with badges, code blocks, and clear headings.
-Make it engaging and easy to follow for ${options.targetAudience || 'users'}.`,
+Use proper Markdown formatting with dynamic badges, beautifully formatted code blocks, and clear, structured headings.
+Make it engaging, professional, and easy to follow for ${options.targetAudience || 'users'}. Ensure it feels like a top-tier open-source project README.`,
       },
       {
         role: 'user',

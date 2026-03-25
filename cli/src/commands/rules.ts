@@ -5,6 +5,8 @@ import { repositoryManager } from '../core/repository';
 import { createProgressBar } from '../utils/progress';
 import * as fs from 'fs';
 import * as path from 'path';
+import { reporter, ReviewResult, Finding } from '../utils/reporter';
+import { locCounter } from '../core/loc-counter';
 import { createDebugLogger } from '../utils/debug-logger';
 import { createPerformanceTracker } from '../utils/performance-tracker';
 import { handleCommandError } from '../utils/error-handler';
@@ -144,11 +146,48 @@ export async function rulesCommand(options: RulesOptions): Promise<void> {
 
       fs.writeFileSync(resultsPath, JSON.stringify(result, null, 2));
 
+      // Generate comprehensive markdown report
+      const findings: Finding[] = result.violations.map((v: any) => ({
+        severity: v.severity,
+        category: 'rules',
+        file: v.file,
+        line: v.line,
+        description: v.message || 'Rule violation',
+        suggestion: v.suggestion || (v.autofix?.available ? v.autofix.description : undefined)
+      }));
+
+      let locStats: any = { totalLines: 0, codeLines: 0, commentLines: 0, blankLines: 0, fileCount: 0, fileBreakdown: [] };
+      try {
+        locStats = await locCounter.count();
+      } catch (e) {
+        // ignore
+      }
+
+      const reviewResult: ReviewResult = {
+        summary: `Custom rules engine scanned ${files.length} files and found ${result.totalViolations} violations.`,
+        findings,
+        recommendations: [
+          'Review the violations above and apply necessary fixes.',
+          result.violations.some((v: any) => v.autofix?.available) ? 'Run the rules command with --fix to apply auto-fixes.' : ''
+        ].filter(Boolean),
+        metadata: {
+          timestamp: new Date().toISOString(),
+          repoInfo,
+          locStats,
+          provider: 'custom-rules',
+          model: 'rule-engine',
+          durationMs: 0
+        }
+      };
+
+      const reportPath = reporter.saveReport(reviewResult, 'markdown', undefined, 'rules');
+
       completedSteps++;
       progressBar.update(completedSteps, { status: 'Complete' });
       progressBar.stop();
 
-      console.log(chalk.gray(`  Results saved: ${resultsPath}\n`));
+      console.log(chalk.gray(`  JSON Results saved: ${resultsPath}`));
+      console.log(chalk.green(`  ✓ Report saved: ${reportPath}\n`));
 
       // Exit with error if violations found
       if (result.totalViolations > 0 && (result.severitySummary.critical > 0 || result.severitySummary.high > 0)) {

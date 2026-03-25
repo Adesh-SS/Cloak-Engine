@@ -1,12 +1,14 @@
 graph LR
-    A[Project] --> B1[Backend]
-    A --> B2[CLI]
-    A --> B3[Frontend (Potential)]
-    B1 --> C1[TypeScript Files]
-    B2 --> C2[TypeScript Files]
-    B3 --> C3[TypeScript Files]
-    C1 --> D1[136 .ts files]
-    C2 --> D2[TypeScript Files]
-    C3 --> D3[TypeScript Files]
-    B1 --> E1[1 .js file]
-    style B3 fill:#cccccc
+    component1[Backend] -->|REST API|> component2[Database]
+    component2 -->|SQL|> component3[Data Storage]
+    component1 -->|Microservices|> component4[Service A]
+    component1 -->|Microservices|> component5[Service B]
+    component6[CLI] -->|Command Line|> component1[Backend]
+    component7[Frontend] -->|Web Requests|> component1[Backend]
+    style component1 fill:#f9f,stroke:#333,stroke-width:2px
+    style component2 fill:#f9f,stroke:#333,stroke-width:2px
+    style component3 fill:#f9f,stroke:#333,stroke-width:2px
+    style component4 fill:#f9f,stroke:#333,stroke-width:2px
+    style component5 fill:#f9f,stroke:#333,stroke-width:2px
+    style component6 fill:#f9f,stroke:#333,stroke-width:2px
+    style component7 fill:#f9f,stroke:#333,stroke-width:2px

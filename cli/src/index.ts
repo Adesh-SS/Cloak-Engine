@@ -44,14 +44,17 @@ program
   .action(initCommand);
 
 program
-  .command("run")
+  .command("run [files...]")
   .description(
     "Code review (FREE tier without API key, AI-enhanced with configuration)"
   )
   .option("-f, --files <patterns...>", "Specific files or patterns to review")
   .option("--with-ai", "Use AI enhancement (requires API key)", true)
   .option("--no-cloud", "Skip cloud credit validation")
-  .action(runCommand);
+  .action((files, options) => {
+    if (files && files.length > 0) options.files = files;
+    runCommand(options);
+  });
 
 program
   .command("scan")
@@ -68,14 +71,15 @@ program
   .action(scanCommand);
 
 program
-  .command("security")
+  .command("security [files...]")
   .description("Run security vulnerability scan")
   .option("-f, --files <patterns...>", "Specific files or patterns to scan")
   .option("--licenses", "Include license compliance scanning")
   .option("--ai-fix", "Generate AI-powered fix suggestions")
   .option("--interactive", "Interactively review and apply fixes")
   .option("--debug", "Enable verbose debug logging")
-  .action((options) => {
+  .action((files, options) => {
+    if (files && files.length > 0) options.files = files;
     // Set CLOAKSCAN_DEBUG environment variable if --debug flag is present
     if (options.debug) {
       process.env.CLOAKSCAN_DEBUG = "true";
@@ -128,7 +132,7 @@ program
   .action(mutationCommand);
 
 program
-  .command("rules")
+  .command("rules [files...]")
   .description("Run custom rule engine with YAML-based rules")
   .option("--list", "List all available rules")
   .option("--run", "Run rules (default)", true)
@@ -140,7 +144,10 @@ program
     "--export <rule:path>",
     "Export a rule to file (format: ruleId:outputPath)"
   )
-  .action(rulesCommand);
+  .action((files, options) => {
+    if (files && files.length > 0) options.files = files.join(',');
+    rulesCommand(options);
+  });
 
 program
   .command("config")
@@ -193,7 +200,7 @@ program
   .action(explainCommand);
 
 program
-  .command("test-gen")
+  .command("test-gen [file]")
   .description("Generate tests using AI (Phase 3 feature)")
   .option("--function <name>", "Generate tests for a specific function")
   .option("--class <name>", "Generate tests for a specific class")
@@ -205,7 +212,10 @@ program
   )
   .option("-o, --output <path>", "Custom output path for test file")
   .option("--coverage", "Show coverage estimation")
-  .action(testGenCommand);
+  .action((file, options) => {
+    if (file && typeof file === "string") options.file = file;
+    testGenCommand(options);
+  });
 
 program
   .command("docs")
@@ -241,7 +251,7 @@ program
   .action(chatCommand);
 
 program
-  .command("refactor")
+  .command("refactor [file]")
   .description("AI-powered refactoring suggestions (Phase 5 feature)")
   .option("-f, --file <path>", "Specific file to analyze")
   .option("--function <name>", "Analyze specific function")
@@ -253,10 +263,13 @@ program
   .option("-i, --interactive", "Interactive refactoring mode")
   .option("--report", "Generate full refactoring report")
   .option("-o, --output <path>", "Save report to file")
-  .action(refactorCommand);
+  .action((file, options) => {
+    if (file && typeof file === "string") options.file = file;
+    refactorCommand(options);
+  });
 
 program
-  .command("threat-model")
+  .command("threat-model [file]")
   .description(
     "AI-powered threat modeling with STRIDE analysis (Phase 5 feature)"
   )
@@ -277,10 +290,13 @@ program
   )
   .option("--report", "Generate full threat model report")
   .option("-o, --output <path>", "Save report to file")
-  .action(threatModelCommand);
+  .action((file, options) => {
+    if (file && typeof file === "string") options.file = file;
+    threatModelCommand(options);
+  });
 
 program
-  .command("migrate")
+  .command("migrate [file]")
   .description("AI-powered code migration assistant (Phase 5 feature)")
   .option(
     "-t, --type <type>",
@@ -298,10 +314,13 @@ program
   .option("--backup", "Create backups of original files", true)
   .option("--report", "Generate migration report")
   .option("-o, --output <path>", "Save report to file")
-  .action(migrateCommand);
+  .action((file, options) => {
+    if (file && typeof file === "string") options.file = file;
+    migrateCommand(options);
+  });
 
 program
-  .command("review")
+  .command("review [file]")
   .description("AI-powered code review for git changes (Phase 5 feature)")
   .option("--base <ref>", "Base git reference (default: HEAD)", "HEAD")
   .option("--head <ref>", "Head git reference for comparison")
@@ -316,7 +335,10 @@ program
   )
   .option("--report", "Generate full detailed report")
   .option("-o, --output <path>", "Save report to file")
-  .action(reviewCommand);
+  .action((file, options) => {
+    if (file && typeof file === "string") options.file = file;
+    reviewCommand(options);
+  });
 
 // Display logo when showing help or version
 const args = process.argv.slice(2);

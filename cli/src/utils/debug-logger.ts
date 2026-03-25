@@ -112,6 +112,8 @@ export class DebugLogger {
    * Log an error
    */
   error(message: string, error: unknown): void {
+    if (!this.enabled) return;
+    
     const timestamp = new Date().toISOString();
     const errorData = this.extractErrorData(error);
     

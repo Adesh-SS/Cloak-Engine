@@ -165,12 +165,15 @@ async function generateFullReport(
 
     console.log(chalk.gray('\n' + '═'.repeat(70)));
 
-    // Save report if output specified
-    if (outputPath) {
-      const reportContent = generateMarkdownReport(report);
-      fs.writeFileSync(outputPath, reportContent);
-      console.log(chalk.green(`\n✓ Report saved to: ${outputPath}\n`));
+    // Save report
+    const targetPath = outputPath || path.join(process.cwd(), '.cloakscan', 'reports', `refactor-${new Date().toISOString().replace(/[:.]/g, '-')}.md`);
+    const dir = path.dirname(targetPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
     }
+    const reportContent = generateMarkdownReport(report);
+    fs.writeFileSync(targetPath, reportContent);
+    console.log(chalk.green(`\n✓ Report saved to: ${targetPath}\n`));
 
   } catch (error: any) {
     spinner.fail('Analysis failed');

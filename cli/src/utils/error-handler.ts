@@ -100,8 +100,10 @@ export function handleCommandError(
     // File system errors
     else if (
       errorMessage.includes('enoent') ||
-      errorMessage.includes('file') ||
-      errorMessage.includes('directory')
+      errorMessage.includes('no such file') ||
+      errorMessage.includes('not a directory') ||
+      (errorMessage.includes('file') && errorMessage.includes('not found')) ||
+      (errorMessage.includes('directory') && errorMessage.includes('not found'))
     ) {
       userMessage = 'File system error: File or directory not found';
       details = error.message;

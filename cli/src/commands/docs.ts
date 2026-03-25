@@ -131,22 +131,24 @@ export async function docsCommand(options: DocsCommandOptions): Promise<void> {
     console.log(chalk.cyan('─'.repeat(60)));
 
     // Show preview
-    console.log(chalk.white.bold('\n📄 Documentation Preview:\n'));
+    console.log(chalk.cyan.bold('\n📄 Documentation Preview:\n'));
+    console.log(chalk.gray('╭' + '─'.repeat(78) + '╮'));
     const lines = result.content.split('\n').slice(0, 30);
     lines.forEach((line, i) => {
       // Syntax highlighting for headers
       if (line.startsWith('#')) {
-        console.log(chalk.white.bold(line));
+        console.log(chalk.gray('│ ') + chalk.white.bold(line.padEnd(77)) + chalk.gray('│'));
       } else if (line.startsWith('```')) {
-        console.log(chalk.gray(line));
+        console.log(chalk.gray('│ ') + chalk.gray(line.padEnd(77)) + chalk.gray('│'));
       } else {
-        console.log(chalk.white(line));
+        console.log(chalk.gray('│ ') + chalk.white(line.substring(0, 77).padEnd(77)) + chalk.gray('│'));
       }
     });
 
     if (result.content.split('\n').length > 30) {
-      console.log(chalk.gray(`\n... (${result.content.split('\n').length - 30} more lines)`));
+      console.log(chalk.gray('│ ') + chalk.gray(`... (${result.content.split('\n').length - 30} more lines)`.padEnd(77)) + chalk.gray('│'));
     }
+    console.log(chalk.gray('╰' + '─'.repeat(78) + '╯'));
 
     // Save to file
     const outputPath = await docsGen.saveDocs(result, options.output);
